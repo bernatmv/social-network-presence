@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Box, FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Typography} from '@mui/material';
+import {Box, Card, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography} from '@mui/material';
 
 import {StyledButton, StyledTypography} from './styles/SocialNetworkAnalysis.styles';
 
@@ -17,7 +17,7 @@ const SocialNetworkAnalysis: React.FC<SocialNetworkAnalysisProps> = ({
     analyzeNetwork,
     isolatedUsers
 }) => (
-    <Paper sx={{p: 3}}>
+    <Card variant="outlined" sx={{p: 3}}>
         <StyledTypography variant="h6" gutterBottom>
             Available Networks
         </StyledTypography>
@@ -36,7 +36,7 @@ const SocialNetworkAnalysis: React.FC<SocialNetworkAnalysisProps> = ({
                 <Typography>Number of isolated users: {isolatedUsers}</Typography>
             </Box>
         )}
-    </Paper>
+    </Card>
 );
 
 export default SocialNetworkAnalysis;
