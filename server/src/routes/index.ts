@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import {Router} from 'express';
 
 import peopleRoutes from './peopleRoutes';
 import socialNetworkRoutes from './socialNetworkRoutes';
