@@ -7,7 +7,7 @@ import SocialNetworkAnalysisContainer from './networkAnalysis/SocialNetworkAnaly
 import PersonAnalysisContainer from './personAnalysis/PersonAnalysisContainer';
 
 const ResponsiveContent: React.FC = () => (
-    <Container maxWidth="xl" sx={{py: 4}}>
+    <Container maxWidth={false} sx={{py: 4}}>
         <Grid container spacing={3}>
             <SocialNetworkAnalysisContainer />
             <EmptyColumn />
