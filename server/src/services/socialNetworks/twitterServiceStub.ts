@@ -2,12 +2,12 @@ import {SocialNetwork} from './types';
 
 const stub = {
     sn: 'twitter',
-    people: [{name: 'John'}, {name: 'Sarah'}, {name: 'Peter'}, {name: 'Mike'}, {name: 'Lisa'}],
+    people: [{name: 'Bernat'}, {name: 'Gemma'}, {name: 'Marti'}, {name: 'Jana'}, {name: 'Bruna'}],
     relationships: [
-        {type: 'HasConnection', startNode: 'John', endNode: 'Sarah'},
-        {type: 'HasConnection', startNode: 'Sarah', endNode: 'Peter'},
-        {type: 'HasConnection', startNode: 'Peter', endNode: 'Mike'},
-        {type: 'HasConnection', startNode: 'Mike', endNode: 'Lisa'}
+        {type: 'HasConnection', startNode: 'Bernat', endNode: 'Gemma'},
+        {type: 'HasConnection', startNode: 'Gemma', endNode: 'Marti'},
+        {type: 'HasConnection', startNode: 'Marti', endNode: 'Jana'},
+        {type: 'HasConnection', startNode: 'Jana', endNode: 'Bruna'}
     ]
 };
 

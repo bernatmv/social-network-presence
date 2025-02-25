@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {RootState} from '@/store';
 import {setSelectedPerson} from '@/store/socialNetworkSlice';
-import {Grid, Paper} from '@mui/material';
+import {Card, Grid} from '@mui/material';
 import {useQuery} from '@tanstack/react-query';
 
 import api from '../../services/api';
@@ -27,9 +27,9 @@ const PersonAnalysisContainer: React.FC = () => {
         dispatch(setSelectedPerson(person));
     };
 
-    const handlePersonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handlePersonChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setPerson(event.target.value);
-    };
+    }, []);
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -39,7 +39,7 @@ const PersonAnalysisContainer: React.FC = () => {
 
     return (
         <Grid item xs={12} md={4} lg={4} xl={4}>
-            <Paper sx={{p: 3}}>
+            <Card variant="outlined" sx={{p: 3}}>
                 <PersonAnalysis
                     person={person}
                     handlePersonChange={handlePersonChange}
@@ -49,7 +49,7 @@ const PersonAnalysisContainer: React.FC = () => {
                 <Grid container spacing={2}>
                     {connectionsData && connectionsData.map(data => <PersonConnections key={data.sn} {...data} />)}
                 </Grid>
-            </Paper>
+            </Card>
         </Grid>
     );
 };

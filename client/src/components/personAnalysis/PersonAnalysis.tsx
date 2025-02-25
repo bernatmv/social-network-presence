@@ -1,6 +1,8 @@
 import React from 'react';
 
-import {Button, TextField, Typography} from '@mui/material';
+import {Button, TextField} from '@mui/material';
+
+import {StyledTypography} from './styles/PersonAnalysis.styles';
 
 interface PersonAnalysisProps {
     person: string;
@@ -17,9 +19,9 @@ const PersonAnalysis: React.FC<PersonAnalysisProps> = ({
 }) => {
     return (
         <>
-            <Typography variant="h5" gutterBottom>
-                Analyze Person&apos;s Connections
-            </Typography>
+            <StyledTypography variant="h5" gutterBottom>
+                Person&apos;s Presence
+            </StyledTypography>
             <TextField
                 fullWidth
                 label="Person Name"

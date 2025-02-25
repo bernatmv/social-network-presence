@@ -1,7 +1,7 @@
 import {Request, Response, Router} from 'express';
 import asyncHandler from 'express-async-handler';
 
-import {getNetworkConnections} from '../models/network/networkModel';
+import {getIsolatedCountForNetwork} from '../models/network/networkModel';
 import {getSocialNetworkGraph} from '../services/socialNetworks';
 
 const router = Router();
@@ -22,7 +22,7 @@ router.get(
     asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const {network} = req.params;
 
-        const networkConnections = await getNetworkConnections(network);
+        const networkConnections = await getIsolatedCountForNetwork(network);
 
         res.json({count: networkConnections.isolated});
     })

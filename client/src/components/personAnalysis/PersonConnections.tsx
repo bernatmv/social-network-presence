@@ -2,6 +2,8 @@ import React from 'react';
 
 import {Grid, Typography} from '@mui/material';
 
+import {StyledTypography} from './styles/PersonConnections.styles';
+
 interface PersonConnectionsProps {
     sn: string;
     firstDegree: number;
@@ -11,9 +13,9 @@ interface PersonConnectionsProps {
 const PersonConnections: React.FC<PersonConnectionsProps> = ({sn, firstDegree, secondDegree}) => {
     return (
         <Grid item xs={12}>
-            <Typography variant="subtitle1" gutterBottom>
+            <StyledTypography variant="subtitle1" gutterBottom>
                 Social network: {sn}
-            </Typography>
+            </StyledTypography>
             <Typography>First degree connections: {firstDegree}</Typography>
             <Typography>Second degree connections: {secondDegree}</Typography>
         </Grid>

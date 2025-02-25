@@ -1,16 +1,8 @@
 import React from 'react';
 
-import {
-    Box,
-    Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    SelectChangeEvent,
-    Typography
-} from '@mui/material';
+import {Box, FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Typography} from '@mui/material';
+
+import {StyledButton, StyledTypography} from './styles/SocialNetworkAnalysis.styles';
 
 interface SocialNetworkAnalysisProps {
     selectedNetwork: string;
@@ -26,18 +18,18 @@ const SocialNetworkAnalysis: React.FC<SocialNetworkAnalysisProps> = ({
     isolatedUsers
 }) => (
     <Paper sx={{p: 3}}>
-        <Typography variant="h6" gutterBottom>
-            Find Isolated Users
-        </Typography>
+        <StyledTypography variant="h6" gutterBottom>
+            Available Networks
+        </StyledTypography>
         <FormControl fullWidth>
-            <InputLabel>Social Network</InputLabel>
-            <Select value={selectedNetwork} label="Social Network" onChange={handleNetworkChange}>
+            <InputLabel>Network Name</InputLabel>
+            <Select value={selectedNetwork} label="Name" onChange={handleNetworkChange}>
                 <MenuItem value="facebook">Facebook</MenuItem>
                 <MenuItem value="twitter">Twitter</MenuItem>
             </Select>
-            <Button variant="contained" onClick={analyzeNetwork}>
+            <StyledButton variant="contained" onClick={analyzeNetwork}>
                 Analyze
-            </Button>
+            </StyledButton>
         </FormControl>
         {isolatedUsers !== undefined && (
             <Box sx={{mt: 2}}>

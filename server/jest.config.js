@@ -16,6 +16,5 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1'
     },
     coverageDirectory: 'coverage',
-    collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
-    setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts']
+    collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts']
 };

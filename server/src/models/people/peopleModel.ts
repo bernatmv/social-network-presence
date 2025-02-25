@@ -1,49 +1,50 @@
 import {getAllSocialNetworksGraphs} from '../../services/socialNetworks';
-import {SocialNetwork} from '../../services/socialNetworks/types';
+import {createNetworkGraph} from '../network/networkModel';
+import {NetworkGraph, PersonNode} from '../network/types';
 import {PersonConnections} from './types';
 
-// IF performance is an issue, we can optimize this by keeping a count of the names saved in a record
-function getFirstDegreeConnections(name: string, graph: SocialNetwork): string[] {
-    const connections: string[] = [];
+function getFirstDegreeConnections(name: string, graph: NetworkGraph): PersonNode[] {
+    if (!graph.people[name]) {
+        return [];
+    }
 
-    graph.relationships.map((relationship: any) => {
-        if (relationship.startNode === name && !connections.includes(relationship.endNode)) {
-            connections.push(relationship.endNode);
-        }
-
-        if (relationship.endNode === name && !connections.includes(relationship.startNode)) {
-            connections.push(relationship.startNode);
-        }
-    });
-
-    return connections;
+    return graph.people[name].connections;
 }
 
-function getSecondDegreeConnections(name: string, connections: string[], graph: SocialNetwork): string[] {
-    const secondDegreeConnections: string[] = [];
+function getSecondDegreeConnections(name: string, graph: NetworkGraph): PersonNode[] {
+    if (!graph.people[name]) {
+        return [];
+    }
 
-    connections.forEach(connection => {
-        const firstDegreeConnections = getFirstDegreeConnections(connection, graph);
+    const secondDegreeConnections: PersonNode[] = [];
 
-        secondDegreeConnections.push(...firstDegreeConnections);
+    graph.people[name].visited = true;
+    graph.people[name].connections.forEach(connection => {
+        connection.visited = true;
+    });
+    graph.people[name].connections.forEach(connection => {
+        connection.connections.forEach(secondDegreeConnection => {
+            if (secondDegreeConnection.visited) {
+                return;
+            }
+
+            secondDegreeConnection.visited = true;
+
+            secondDegreeConnections.push(secondDegreeConnection);
+        });
     });
 
-    // Remove duplicates and those that are already in the provided connections (because those are already first degree)
-    const uniqueSecondDegreeConnections = secondDegreeConnections.filter(
-        (connection, index, self) =>
-            self.indexOf(connection) === index && !connections.includes(connection) && connection !== name
-    );
-
-    return uniqueSecondDegreeConnections;
+    return secondDegreeConnections;
 }
 
 export async function getConnections(name: string): Promise<PersonConnections> {
-    const graphs = await getAllSocialNetworksGraphs();
+    const graphsDtos = await getAllSocialNetworksGraphs();
 
-    // TODO: just 1st level connections, to have something print on first commit
+    const graphs = graphsDtos.map(graphDto => createNetworkGraph(graphDto));
+
     const connections = graphs.map(graph => {
         const firstDegreeConnections = getFirstDegreeConnections(name, graph);
-        const secondDegreeConnections = getSecondDegreeConnections(name, firstDegreeConnections, graph);
+        const secondDegreeConnections = getSecondDegreeConnections(name, graph);
 
         return {
             sn: graph.sn,
