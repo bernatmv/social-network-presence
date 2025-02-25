@@ -1,0 +1,19 @@
+{
+  "name": "social-network-presence",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:server": "npm run start --workspace=server",
+    "start:client": "npm run start --workspace=client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run start:client\"",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "author": "Bernat Martinez Vidal"
+}
