@@ -1,55 +1,62 @@
 import {getAllSocialNetworksGraphs} from '../../services/socialNetworks';
 import {createNetworkGraph} from '../network/networkModel';
-import {NetworkGraph, PersonNode} from '../network/types';
+import {PersonNode} from '../network/types';
 import {PersonConnections} from './types';
 
-function getFirstDegreeConnections(name: string, graph: NetworkGraph): PersonNode[] {
-    if (!graph.people[name]) {
-        return [];
+function addNodeAtDegree(node: PersonNode, degree: number, connections: PersonNode[][]) {
+    if (node.visited) {
+        return;
     }
 
-    return graph.people[name].connections;
+    node.visited = true;
+
+    connections[degree].push(node);
 }
 
-function getSecondDegreeConnections(name: string, graph: NetworkGraph): PersonNode[] {
-    if (!graph.people[name]) {
-        return [];
+function getNodeConnectionsForDegree(
+    node: PersonNode,
+    currentDegree: number,
+    maxDegree: number,
+    connections: PersonNode[][]
+) {
+    // first traverse all siblings, if we traverse children first we will add some nodes at lower degrees than expected)
+    node.connections.forEach(connection => {
+        addNodeAtDegree(connection, currentDegree, connections);
+    });
+
+    // then traverse children if we still need to go further
+    if (currentDegree < maxDegree) {
+        node.connections.forEach(connection =>
+            getNodeConnectionsForDegree(connection, currentDegree + 1, maxDegree, connections)
+        );
+    }
+}
+
+function getNodeConnectionsUntilDegree(node: PersonNode | undefined, degree: number): PersonNode[][] {
+    const connections: PersonNode[][] = Array.from({length: degree + 1}, () => []);
+
+    if (!node) {
+        return connections;
     }
 
-    const secondDegreeConnections: PersonNode[] = [];
+    addNodeAtDegree(node, 0, connections);
 
-    graph.people[name].visited = true;
-    graph.people[name].connections.forEach(connection => {
-        connection.visited = true;
-    });
-    graph.people[name].connections.forEach(connection => {
-        connection.connections.forEach(secondDegreeConnection => {
-            if (secondDegreeConnection.visited) {
-                return;
-            }
+    getNodeConnectionsForDegree(node, 1, degree, connections);
 
-            secondDegreeConnection.visited = true;
-
-            secondDegreeConnections.push(secondDegreeConnection);
-        });
-    });
-
-    return secondDegreeConnections;
+    return connections;
 }
 
-export async function getConnections(name: string): Promise<PersonConnections> {
+export async function getConnectionsUntilDegree(name: string, degree: number): Promise<PersonConnections> {
     const graphsDtos = await getAllSocialNetworksGraphs();
 
     const graphs = graphsDtos.map(graphDto => createNetworkGraph(graphDto));
 
     const connections = graphs.map(graph => {
-        const firstDegreeConnections = getFirstDegreeConnections(name, graph);
-        const secondDegreeConnections = getSecondDegreeConnections(name, graph);
+        const nodeConnections = getNodeConnectionsUntilDegree(graph.people[name], degree);
 
         return {
             sn: graph.sn,
-            firstDegree: firstDegreeConnections.length,
-            secondDegree: secondDegreeConnections.length
+            connectionsCount: nodeConnections.map(connections => connections.length).slice(1)
         };
     });
 
@@ -57,5 +64,6 @@ export async function getConnections(name: string): Promise<PersonConnections> {
 }
 
 export default {
-    getConnections
+    getConnectionsUntilDegree,
+    getNodeConnectionsUntilDegree
 };

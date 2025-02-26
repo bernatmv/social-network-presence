@@ -1,16 +1,16 @@
 import {Request, Response, Router} from 'express';
 import asyncHandler from 'express-async-handler';
 
-import {getConnections} from '../models/people/peopleModel';
+import {getConnectionsUntilDegree} from '../models/people/peopleModel';
 
 const router = Router();
 
 router.get(
-    '/:name/connections',
+    '/:name/connections/:degree',
     asyncHandler(async (req: Request, res: Response) => {
-        const {name} = req.params;
+        const {name, degree} = req.params;
 
-        const results = await getConnections(name);
+        const results = await getConnectionsUntilDegree(name, Number.parseInt(degree));
 
         res.json(results.connections);
     })

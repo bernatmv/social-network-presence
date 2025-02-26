@@ -12,8 +12,8 @@ describe('peopleModel', () => {
         jest.clearAllMocks();
     });
 
-    describe('getConnections', () => {
-        it('should calculate first and second-degree connections correctly', async () => {
+    describe('getConnectionsUntilDegree', () => {
+        it('should calculate connections up to specified degree correctly', async () => {
             mockGetAllSocialNetworksGraphs.mockResolvedValue([
                 {
                     sn: 'facebook',
@@ -26,15 +26,14 @@ describe('peopleModel', () => {
                 }
             ]);
 
-            const result = await peopleModel.getConnections('Bernat');
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
 
             expect(result).toEqual({
                 name: 'Bernat',
                 connections: [
                     {
                         sn: 'facebook',
-                        firstDegree: 1, // Gemma
-                        secondDegree: 2 // Marti and Jana
+                        connectionsCount: [1, 2] // [1st degree = Gemma, 2nd degree = Marti and Jana]
                     }
                 ]
             });
@@ -61,20 +60,18 @@ describe('peopleModel', () => {
                 }
             ]);
 
-            const result = await peopleModel.getConnections('Bernat');
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
 
             expect(result).toEqual({
                 name: 'Bernat',
                 connections: [
                     {
                         sn: 'facebook',
-                        firstDegree: 1, // Gemma
-                        secondDegree: 1 // Marti
+                        connectionsCount: [1, 1] // [1st = Gemma, 2nd = Marti]
                     },
                     {
                         sn: 'twitter',
-                        firstDegree: 1, // Jana
-                        secondDegree: 1 // Bruna (Pere is 3rd degree)
+                        connectionsCount: [1, 1] // [1st = Jana, 2nd = Bruna]
                     }
                 ]
             });
@@ -89,15 +86,14 @@ describe('peopleModel', () => {
                 }
             ]);
 
-            const result = await peopleModel.getConnections('Bernat');
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
 
             expect(result).toEqual({
                 name: 'Bernat',
                 connections: [
                     {
                         sn: 'facebook',
-                        firstDegree: 0,
-                        secondDegree: 0
+                        connectionsCount: [0, 0] // No connections at any degree
                     }
                 ]
             });
@@ -112,15 +108,14 @@ describe('peopleModel', () => {
                 }
             ]);
 
-            const result = await peopleModel.getConnections('Bernat');
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
 
             expect(result).toEqual({
                 name: 'Bernat',
                 connections: [
                     {
                         sn: 'facebook',
-                        firstDegree: 0,
-                        secondDegree: 0
+                        connectionsCount: [0, 0] // Person doesn't exist
                     }
                 ]
             });
@@ -135,15 +130,14 @@ describe('peopleModel', () => {
                 }
             ]);
 
-            const result = await peopleModel.getConnections('Bernat');
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
 
             expect(result).toEqual({
                 name: 'Bernat',
                 connections: [
                     {
                         sn: 'facebook',
-                        firstDegree: 0,
-                        secondDegree: 0
+                        connectionsCount: [0, 0] // Empty network
                     }
                 ]
             });
@@ -152,10 +146,10 @@ describe('peopleModel', () => {
         it('should handle service errors', async () => {
             mockGetAllSocialNetworksGraphs.mockRejectedValue(new Error('Service error'));
 
-            await expect(peopleModel.getConnections('Bernat')).rejects.toThrow('Service error');
+            await expect(peopleModel.getConnectionsUntilDegree('Bernat', 2)).rejects.toThrow('Service error');
         });
 
-        it('should not count first-degree connections as second-degree', async () => {
+        it('should not count connections multiple times', async () => {
             mockGetAllSocialNetworksGraphs.mockResolvedValue([
                 {
                     sn: 'facebook',
@@ -168,24 +162,127 @@ describe('peopleModel', () => {
                 }
             ]);
 
-            const result = await peopleModel.getConnections('Bernat');
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
 
             expect(result).toEqual({
                 name: 'Bernat',
                 connections: [
                     {
                         sn: 'facebook',
-                        firstDegree: 2, // Gemma and Marti are first degree
-                        secondDegree: 0 // Marti should not be counted as second degree
+                        connectionsCount: [2, 0] // [Gemma and Marti as 1st degree, none as 2nd degree]
                     }
                 ]
             });
         });
 
-        // TODO: if the graph can be erroneous:
-        // (eg: we can have duplicate relationships Bernat -> Gemma and Gemma -> Bernat)
-        // (eg: we can have relantionship to ourselves: Bernat -> Bernat)
-        // we will need to handle these cases when creating the graph and expand the test cases
-        // for this exercise I didn't feel this level of detail was needed
+        it('should handle different degrees of connections', async () => {
+            mockGetAllSocialNetworksGraphs.mockResolvedValue([
+                {
+                    sn: 'facebook',
+                    people: [{name: 'Bernat'}, {name: 'Gemma'}, {name: 'Marti'}, {name: 'Jana'}, {name: 'Pere'}],
+                    relationships: [
+                        {type: 'HasConnection', startNode: 'Bernat', endNode: 'Gemma'},
+                        {type: 'HasConnection', startNode: 'Gemma', endNode: 'Marti'},
+                        {type: 'HasConnection', startNode: 'Marti', endNode: 'Jana'},
+                        {type: 'HasConnection', startNode: 'Jana', endNode: 'Pere'}
+                    ]
+                }
+            ]);
+
+            // Test with degree 1
+            const result1 = await peopleModel.getConnectionsUntilDegree('Bernat', 1);
+            expect(result1).toEqual({
+                name: 'Bernat',
+                connections: [
+                    {
+                        sn: 'facebook',
+                        connectionsCount: [1] // [Gemma]
+                    }
+                ]
+            });
+
+            // Test with degree 3
+            const result3 = await peopleModel.getConnectionsUntilDegree('Bernat', 3);
+            expect(result3).toEqual({
+                name: 'Bernat',
+                connections: [
+                    {
+                        sn: 'facebook',
+                        connectionsCount: [1, 1, 1] // [Gemma, Marti, Jana]
+                    }
+                ]
+            });
+
+            // Test with degree 4
+            const result4 = await peopleModel.getConnectionsUntilDegree('Bernat', 4);
+            expect(result4).toEqual({
+                name: 'Bernat',
+                connections: [
+                    {
+                        sn: 'facebook',
+                        connectionsCount: [1, 1, 1, 1] // [Gemma, Marti, Jana, Pere]
+                    }
+                ]
+            });
+        });
+
+        it('should handle circular relationships', async () => {
+            mockGetAllSocialNetworksGraphs.mockResolvedValue([
+                {
+                    sn: 'facebook',
+                    people: [{name: 'Bernat'}, {name: 'Gemma'}, {name: 'Marti'}, {name: 'Jana'}],
+                    relationships: [
+                        {type: 'HasConnection', startNode: 'Bernat', endNode: 'Gemma'},
+                        {type: 'HasConnection', startNode: 'Gemma', endNode: 'Marti'},
+                        {type: 'HasConnection', startNode: 'Marti', endNode: 'Jana'},
+                        {type: 'HasConnection', startNode: 'Jana', endNode: 'Bernat'} // Creates circular reference
+                    ]
+                }
+            ]);
+
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
+
+            expect(result).toEqual({
+                name: 'Bernat',
+                connections: [
+                    {
+                        sn: 'facebook',
+                        connectionsCount: [2, 1]
+                    }
+                ]
+            });
+        });
+
+        it('should ignore invalid relationship types', async () => {
+            mockGetAllSocialNetworksGraphs.mockResolvedValue([
+                {
+                    sn: 'facebook',
+                    people: [{name: 'Bernat'}, {name: 'Gemma'}, {name: 'Marti'}],
+                    relationships: [
+                        {type: 'HasConnection', startNode: 'Bernat', endNode: 'Gemma'},
+                        {type: 'OtherType', startNode: 'Bernat', endNode: 'Marti'},
+                        {type: 'InvalidType', startNode: 'Gemma', endNode: 'Marti'}
+                    ]
+                }
+            ]);
+
+            const result = await peopleModel.getConnectionsUntilDegree('Bernat', 2);
+
+            expect(result).toEqual({
+                name: 'Bernat',
+                connections: [
+                    {
+                        sn: 'facebook',
+                        connectionsCount: [1, 0]
+                    }
+                ]
+            });
+        });
     });
+
+    // TODO: if the graph can be erroneous:
+    // (eg: we can have duplicate relationships Bernat -> Gemma and Gemma -> Bernat)
+    // (eg: we can have relantionship to ourselves: Bernat -> Bernat)
+    // we will need to handle these cases when creating the graph and expand the test cases
+    // for this exercise I didn't feel this level of detail was needed
 });

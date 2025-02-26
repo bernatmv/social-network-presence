@@ -5,8 +5,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api
 
 export interface NetworkConnections {
     sn: string;
-    firstDegree: number;
-    secondDegree: number;
+    connectionsCount: number[];
 }
 
 export type ConnectionsResponse = NetworkConnections[];
@@ -22,8 +21,8 @@ const api = {
         return response.data;
     },
 
-    getPersonConnections: async (name: string): Promise<ConnectionsResponse> => {
-        const response = await axios.get(`${API_BASE_URL}/people/${name}/connections`);
+    getPersonConnections: async (name: string, degree: number): Promise<ConnectionsResponse> => {
+        const response = await axios.get(`${API_BASE_URL}/people/${name}/connections/${degree}`);
         return response.data;
     }
 };

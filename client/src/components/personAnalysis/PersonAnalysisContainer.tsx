@@ -17,7 +17,7 @@ const PersonAnalysisContainer: React.FC = () => {
 
     const {data: connectionsData} = useQuery({
         queryKey: ['connections', selectedPerson],
-        queryFn: () => api.getPersonConnections(selectedPerson),
+        queryFn: () => api.getPersonConnections(selectedPerson, 2),
         enabled: !!selectedPerson
     });
 
@@ -47,7 +47,7 @@ const PersonAnalysisContainer: React.FC = () => {
                     changeSelectedPerson={changeSelectedPerson}
                 />
                 <Grid container spacing={2}>
-                    {connectionsData && connectionsData.map(data => <PersonConnections key={data.sn} {...data} />)}
+                    <PersonConnections connections={connectionsData} />
                 </Grid>
             </Card>
         </Grid>

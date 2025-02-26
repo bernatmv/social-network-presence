@@ -1,23 +1,39 @@
 import React from 'react';
 
-import {Grid, Typography} from '@mui/material';
+import {Grid} from '@mui/material';
 
-import {StyledTypography} from './styles/PersonConnections.styles';
+import {Column, HeaderColumn, HeaderRow, Row} from './styles/PersonConnections.styles';
 
 interface PersonConnectionsProps {
-    sn: string;
-    firstDegree: number;
-    secondDegree: number;
+    connections?: {
+        sn: string;
+        connectionsCount: number[];
+    }[];
 }
 
-const PersonConnections: React.FC<PersonConnectionsProps> = ({sn, firstDegree, secondDegree}) => {
+const PersonConnections: React.FC<PersonConnectionsProps> = ({connections}) => {
+    if (!connections) {
+        return null;
+    }
+
+    const degrees = connections[0]?.connectionsCount?.length ?? 0;
+
     return (
         <Grid item xs={12}>
-            <StyledTypography variant="subtitle1" gutterBottom>
-                Social network: {sn}
-            </StyledTypography>
-            <Typography>First degree connections: {firstDegree}</Typography>
-            <Typography>Second degree connections: {secondDegree}</Typography>
+            <HeaderRow>
+                <HeaderColumn>Network</HeaderColumn>
+                {Array.from({length: degrees}).map((_, index) => (
+                    <HeaderColumn key={index}>Degree {index + 1}</HeaderColumn>
+                ))}
+            </HeaderRow>
+            {connections.map(({sn, connectionsCount}) => (
+                <Row key={sn}>
+                    <Column>{sn}</Column>
+                    {connectionsCount.map((count, index) => (
+                        <Column key={index}>{count}</Column>
+                    ))}
+                </Row>
+            ))}
         </Grid>
     );
 };

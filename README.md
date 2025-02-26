@@ -6,8 +6,6 @@ A full-stack application for analyzing social network connections and relationsh
 
 ### Backend (Node.js + Express + TypeScript)
 
-The server is structured using a modular architecture:
-
 ```
 server/
 ├── src/
@@ -27,8 +25,6 @@ Key features:
 - Error handling and type safety with TypeScript
 
 ### Frontend (React + TypeScript)
-
-The client uses modern React patterns and tools:
 
 ```
 client/
@@ -91,9 +87,9 @@ npm test
 
 ## API Endpoints
 
-### GET `/api/people/:name/connections`
+### GET `/api/people/:name/connections/:degree`
 
-Returns first and second-degree connections for a person across all social networks.
+Returns connections until specified degree for a person across all social networks.
 
 Response format:
 
@@ -103,8 +99,7 @@ Response format:
   "connections": [
     {
       "sn": "string",
-      "firstDegree": number,
-      "secondDegree": number
+      "connectionsCount": [number]
     }
   ]
 }

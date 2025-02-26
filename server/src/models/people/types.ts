@@ -5,6 +5,5 @@ export interface PersonConnections {
 
 export interface SocialNetworkConnections {
     sn: string;
-    firstDegree: number;
-    secondDegree: number;
+    connectionsCount: number[];
 }
