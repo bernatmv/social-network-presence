@@ -279,10 +279,4 @@ describe('peopleModel', () => {
             });
         });
     });
-
-    // TODO: if the graph can be erroneous:
-    // (eg: we can have duplicate relationships Bernat -> Gemma and Gemma -> Bernat)
-    // (eg: we can have relantionship to ourselves: Bernat -> Bernat)
-    // we will need to handle these cases when creating the graph and expand the test cases
-    // for this exercise I didn't feel this level of detail was needed
 });
